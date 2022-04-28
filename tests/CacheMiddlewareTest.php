@@ -17,9 +17,10 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 
-class CacheMiddlewareTest extends \PHPUnit_Framework_TestCase
+class CacheMiddlewareTest extends TestCase
 {
     public function testMiddleware()
     {
@@ -28,7 +29,7 @@ class CacheMiddlewareTest extends \PHPUnit_Framework_TestCase
         $mock = new MockHandler($mocks);
         $handler = HandlerStack::create($mock);
 
-        $adapter = $this->getMock(StorageAdapterInterface::class);
+        $adapter = $this->createMock(StorageAdapterInterface::class);
         $adapter
             ->expects($this->at(0))
             ->method('fetch')
@@ -53,8 +54,8 @@ class CacheMiddlewareTest extends \PHPUnit_Framework_TestCase
 
         $client = new Client(['handler' => $handler]);
 
-        $client->get('http://foo.bar');
+        $client->get('https://foo.bar');
 
-        $client->get('http://foo.bar');
+        $client->get('https://foo.bar');
     }
 }

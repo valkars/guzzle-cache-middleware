@@ -16,7 +16,7 @@ use Csa\GuzzleHttp\Middleware\Cache\NamingStrategy\NamingStrategyInterface;
 use Csa\GuzzleHttp\Middleware\Cache\NamingStrategy\SubfolderNamingStrategy;
 use Csa\GuzzleHttp\Middleware\Cache\CacheMiddleware;
 use Csa\GuzzleHttp\Middleware\Cache\MockMiddleware;
-use GuzzleHttp\Psr7;
+use GuzzleHttp\Psr7\Message;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -60,8 +60,8 @@ class MockStorageAdapter implements StorageAdapterInterface
     public function fetch(RequestInterface $request)
     {
         foreach ($this->namingStrategies as $strategy) {
-            if (file_exists($filename = $this->getFilename($strategy->filename($request)))) {
-                return Psr7\parse_response(file_get_contents($filename));
+            if (\file_exists($filename = $this->getFilename($strategy->filename($request)))) {
+                return Message::parseResponse(\file_get_contents($filename));
             }
         }
     }
@@ -75,14 +75,14 @@ class MockStorageAdapter implements StorageAdapterInterface
             $response = $response->withoutHeader($header);
         }
 
-        list($strategy) = $this->namingStrategies;
+        [$strategy] = $this->namingStrategies;
 
         $filename = $this->getFilename($strategy->filename($request));
 
         $fs = new Filesystem();
-        $fs->mkdir(dirname($filename));
+        $fs->mkdir(\dirname($filename));
 
-        file_put_contents($filename, Psr7\str($response));
+        \file_put_contents($filename, Message::toString($response));
         $response->getBody()->rewind();
     }
 
@@ -93,7 +93,7 @@ class MockStorageAdapter implements StorageAdapterInterface
      *
      * @return string The path to the mock file
      */
-    private function getFilename($name)
+    private function getFilename($name): string
     {
         return $this->storagePath.'/'.$name.'.txt';
     }

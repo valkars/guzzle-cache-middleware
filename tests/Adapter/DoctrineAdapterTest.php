@@ -15,21 +15,17 @@ use Csa\GuzzleHttp\Middleware\Cache\Adapter\DoctrineAdapter;
 use Csa\GuzzleHttp\Middleware\Cache\NamingStrategy\NamingStrategyInterface;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Doctrine\Common\Cache\Cache;
 
-class DoctrineAdapterTest extends \PHPUnit_Framework_TestCase
+class DoctrineAdapterTest extends TestCase
 {
     protected $class = DoctrineAdapter::class;
 
-    public function testConstructor()
+    public function testFetch(): void
     {
-        $cache = $this->getMock('Doctrine\Common\Cache\Cache');
-        new $this->class($cache, 0);
-    }
-
-    public function testFetch()
-    {
-        $cache = $this->getMock('Doctrine\Common\Cache\Cache');
+        $cache = $this->createMock(Cache::class);
 
         $cache
             ->expects($this->at(0))
@@ -60,9 +56,9 @@ class DoctrineAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ResponseInterface::class, $adapter->fetch($request));
     }
 
-    public function testSave()
+    public function testSave(): void
     {
-        $cache = $this->getMock('Doctrine\Common\Cache\Cache');
+        $cache = $this->createMock(Cache::class);
 
         $cache
             ->expects($this->at(0))
@@ -82,10 +78,10 @@ class DoctrineAdapterTest extends \PHPUnit_Framework_TestCase
         $adapter->save($this->getRequestMock(), $this->getResponseMock());
     }
 
-    public function testFetchWithInjectedNamingStrategy()
+    public function testFetchWithInjectedNamingStrategy(): void
     {
-        $cache = $this->getMock('Doctrine\Common\Cache\Cache');
-        $namingStrategy = $this->getMock(NamingStrategyInterface::class);
+        $cache = $this->createMock(Cache::class);
+        $namingStrategy = $this->createMock(NamingStrategyInterface::class);
         $request = $this->getRequestMock();
         $adapter = new $this->class($cache, 0, $namingStrategy);
 
@@ -94,10 +90,10 @@ class DoctrineAdapterTest extends \PHPUnit_Framework_TestCase
         $adapter->fetch($request);
     }
 
-    public function testSaveWithInjectedNamingStrategy()
+    public function testSaveWithInjectedNamingStrategy(): void
     {
-        $cache = $this->getMock('Doctrine\Common\Cache\Cache');
-        $namingStrategy = $this->getMock(NamingStrategyInterface::class);
+        $cache = $this->createMock(Cache::class);
+        $namingStrategy = $this->createMock(NamingStrategyInterface::class);
         $request = $this->getRequestMock();
         $response = $this->getResponseMock();
         $adapter = new $this->class($cache, 0, $namingStrategy);
@@ -107,12 +103,12 @@ class DoctrineAdapterTest extends \PHPUnit_Framework_TestCase
         $adapter->save($request, $response);
     }
 
-    private function getRequestMock()
+    private function getRequestMock(): Request
     {
-        return new Request('GET', 'http://google.com/', ['Accept' => 'text/html']);
+        return new Request('GET', 'https://google.com/', ['Accept' => 'text/html']);
     }
 
-    private function getResponseMock()
+    private function getResponseMock(): Response
     {
         return new Response(200, [], 'Hello World');
     }

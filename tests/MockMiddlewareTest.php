@@ -17,17 +17,18 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 
-class MockMiddlewareTest extends \PHPUnit_Framework_TestCase
+class MockMiddlewareTest extends TestCase
 {
-    public function testRecord()
+    public function testRecord(): void
     {
         $response = new Response(204);
         $mock = new MockHandler([$response]);
         $handler = HandlerStack::create($mock);
 
-        $adapter = $this->getMock(StorageAdapterInterface::class);
+        $adapter = $this->createMock(StorageAdapterInterface::class);
         $adapter
             ->expects($this->once())
             ->method('save')
@@ -41,16 +42,16 @@ class MockMiddlewareTest extends \PHPUnit_Framework_TestCase
 
         $client = new Client(['handler' => $handler]);
 
-        $client->get('http://foo.bar');
+        $client->get('https://foo.bar');
     }
 
-    public function testReplay()
+    public function testReplay(): void
     {
         $response = new Response(204);
         $mock = new MockHandler([$response]);
         $handler = HandlerStack::create($mock);
 
-        $adapter = $this->getMock(StorageAdapterInterface::class);
+        $adapter = $this->createMock(StorageAdapterInterface::class);
         $adapter
             ->expects($this->once())
             ->method('fetch')
@@ -62,18 +63,16 @@ class MockMiddlewareTest extends \PHPUnit_Framework_TestCase
 
         $client = new Client(['handler' => $handler]);
 
-        $client->get('http://foo.bar');
+        $client->get('https://foo.bar');
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Record not found for request: GET http://foo.bar
-     */
-    public function testReplayFailsWithoutMock()
+    public function testReplayFailsWithoutMock(): void
     {
+        $this->expectExceptionMessage("Record not found for request: GET https://foo.bar");
+        $this->expectException(\RuntimeException::class);
         $handler = HandlerStack::create();
 
-        $adapter = $this->getMock(StorageAdapterInterface::class);
+        $adapter = $this->createMock(StorageAdapterInterface::class);
         $adapter
             ->expects($this->once())
             ->method('fetch')
@@ -84,6 +83,6 @@ class MockMiddlewareTest extends \PHPUnit_Framework_TestCase
 
         $client = new Client(['handler' => $handler]);
 
-        $client->get('http://foo.bar');
+        $client->get('https://foo.bar');
     }
 }

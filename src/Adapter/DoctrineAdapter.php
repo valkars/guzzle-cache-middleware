@@ -53,7 +53,7 @@ class DoctrineAdapter implements StorageAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function save(RequestInterface $request, ResponseInterface $response)
+    public function save(RequestInterface $request, ResponseInterface $response): void
     {
         $data = [
             'status' => $response->getStatusCode(),
