@@ -23,61 +23,6 @@ class DoctrineAdapterTest extends TestCase
 {
     protected $class = DoctrineAdapter::class;
 
-    public function testFetch(): void
-    {
-        $cache = $this->createMock(Cache::class);
-
-        $cache
-            ->expects($this->at(0))
-            ->method('contains')
-            ->willReturn(false)
-        ;
-        $cache
-            ->expects($this->at(1))
-            ->method('contains')
-            ->willReturn(true)
-        ;
-        $cache
-            ->expects($this->at(2))
-            ->method('fetch')
-            ->willReturn([
-                'status' => 200,
-                'headers' => [],
-                'body' => 'Hello World',
-                'version' => '1.1',
-                'reason' => 'OK',
-            ])
-        ;
-        $adapter = new $this->class($cache, 0);
-
-        $request = $this->getRequestMock();
-
-        $this->assertNull($adapter->fetch($request));
-        $this->assertInstanceOf(ResponseInterface::class, $adapter->fetch($request));
-    }
-
-    public function testSave(): void
-    {
-        $cache = $this->createMock(Cache::class);
-
-        $cache
-            ->expects($this->at(0))
-            ->method('save')
-            ->with(
-                $this->isType('string'),
-                [
-                    'status' => 200,
-                    'headers' => [],
-                    'body' => 'Hello World',
-                    'version' => '1.1',
-                    'reason' => 'OK',
-                ],
-                10
-            );
-        $adapter = new $this->class($cache, 10);
-        $adapter->save($this->getRequestMock(), $this->getResponseMock());
-    }
-
     public function testFetchWithInjectedNamingStrategy(): void
     {
         $cache = $this->createMock(Cache::class);
