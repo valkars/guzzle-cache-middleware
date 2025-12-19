@@ -24,12 +24,7 @@ class PsrAdapter implements StorageAdapterInterface
     private $namingStrategy;
     private $ttl;
 
-    /**
-     * @param CacheItemPoolInterface $cache
-     * @param int $ttl
-     * @param NamingStrategyInterface|null $namingStrategy
-     */
-    public function __construct(CacheItemPoolInterface $cache, $ttl = 0, NamingStrategyInterface $namingStrategy = null)
+    public function __construct(CacheItemPoolInterface $cache, int $ttl = 0, ?NamingStrategyInterface $namingStrategy = null)
     {
         $this->cache = $cache;
         $this->namingStrategy = $namingStrategy ?: new HashNamingStrategy();

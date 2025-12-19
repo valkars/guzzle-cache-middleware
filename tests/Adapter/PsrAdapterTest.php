@@ -60,8 +60,8 @@ class PsrAdapterTest extends TestCase
 
     private function getCacheMock(): MockObject|CacheItemPoolInterface
     {
-        $item = $this->createMock(CacheItemInterface::class);
-        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $item = $this->createStub(CacheItemInterface::class);
+        $cache = $this->createStub(CacheItemPoolInterface::class);
         $cache->method('getItem')->willReturn($item);
 
         return $cache;

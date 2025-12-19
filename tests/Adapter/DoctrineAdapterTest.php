@@ -25,7 +25,7 @@ class DoctrineAdapterTest extends TestCase
 
     public function testFetchWithInjectedNamingStrategy(): void
     {
-        $cache = $this->createMock(Cache::class);
+        $cache = $this->createStub(Cache::class);
         $namingStrategy = $this->createMock(NamingStrategyInterface::class);
         $request = $this->getRequestMock();
         $adapter = new $this->class($cache, 0, $namingStrategy);
@@ -37,7 +37,7 @@ class DoctrineAdapterTest extends TestCase
 
     public function testSaveWithInjectedNamingStrategy(): void
     {
-        $cache = $this->createMock(Cache::class);
+        $cache = $this->createStub(Cache::class);
         $namingStrategy = $this->createMock(NamingStrategyInterface::class);
         $request = $this->getRequestMock();
         $response = $this->getResponseMock();

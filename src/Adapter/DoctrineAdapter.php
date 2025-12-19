@@ -24,12 +24,7 @@ class DoctrineAdapter implements StorageAdapterInterface
     private $namingStrategy;
     private $ttl;
 
-    /**
-     * @param Cache $cache
-     * @param int $ttl
-     * @param NamingStrategyInterface|null $namingStrategy
-     */
-    public function __construct(Cache $cache, $ttl = 0, NamingStrategyInterface $namingStrategy = null)
+    public function __construct(Cache $cache, int $ttl = 0, ?NamingStrategyInterface $namingStrategy = null)
     {
         $this->cache = $cache;
         $this->namingStrategy = $namingStrategy ?: new HashNamingStrategy();
