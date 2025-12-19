@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the CsaGuzzleBundle package
- *
- * (c) Charles Sarrazin <charles@sarraz.in>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code
- */
-
 namespace Csa\GuzzleHttp\Middleware\Cache\Adapter;
 
 use Csa\GuzzleHttp\Middleware\Cache\NamingStrategy\LegacyNamingStrategy;
@@ -23,24 +14,15 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class MockStorageAdapter implements StorageAdapterInterface
 {
-    private $storagePath;
     /** @var NamingStrategyInterface[] */
-    private $namingStrategies = [];
-    private $responseHeadersBlacklist = [
+    private array $namingStrategies = [];
+    private array $responseHeadersBlacklist = [
         CacheMiddleware::DEBUG_HEADER,
         MockMiddleware::DEBUG_HEADER,
     ];
 
-    /**
-     * @param string $storagePath
-     * @param array $requestHeadersBlacklist
-     * @param array $responseHeadersBlacklist
-     * @param NamingStrategyInterface|null $namingStrategy
-     */
-    public function __construct($storagePath, array $requestHeadersBlacklist = [], array $responseHeadersBlacklist = [], NamingStrategyInterface $namingStrategy = null)
+    public function __construct(private readonly string $storagePath, array $requestHeadersBlacklist = [], array $responseHeadersBlacklist = [], ?NamingStrategyInterface $namingStrategy = null)
     {
-        $this->storagePath = $storagePath;
-
         if ($namingStrategy) {
             $this->namingStrategies[] = $namingStrategy;
         } else {
@@ -57,19 +39,21 @@ class MockStorageAdapter implements StorageAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function fetch(RequestInterface $request)
+    public function fetch(RequestInterface $request): ?ResponseInterface
     {
         foreach ($this->namingStrategies as $strategy) {
             if (\file_exists($filename = $this->getFilename($strategy->filename($request)))) {
                 return Message::parseResponse(\file_get_contents($filename));
             }
         }
+
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function save(RequestInterface $request, ResponseInterface $response)
+    public function save(RequestInterface $request, ResponseInterface $response): void
     {
         foreach ($this->responseHeadersBlacklist as $header) {
             $response = $response->withoutHeader($header);
@@ -89,11 +73,9 @@ class MockStorageAdapter implements StorageAdapterInterface
     /**
      * Prefixes the generated file path with the adapter's storage path.
      *
-     * @param string $name
-     *
      * @return string The path to the mock file
      */
-    private function getFilename($name): string
+    private function getFilename(?string $name): string
     {
         return $this->storagePath.'/'.$name.'.txt';
     }
